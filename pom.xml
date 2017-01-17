@@ -107,6 +107,11 @@
             <version>9.4-1206-jdbc42</version>
         </dependency>
         <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.193</version>
+        </dependency>
+        <dependency>
             <groupId>com.heroku.sdk</groupId>
             <artifactId>heroku-jdbc</artifactId>
             <version>0.1.1</version>
