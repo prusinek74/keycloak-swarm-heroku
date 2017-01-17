@@ -10,10 +10,10 @@ import org.wildfly.swarm.config.undertow.server.Host;
 import org.wildfly.swarm.config.undertow.servlet_container.JSPSetting;
 import org.wildfly.swarm.config.undertow.servlet_container.WebsocketsSetting;
 import org.wildfly.swarm.container.Container;
-import org.wildfly.swarm.spi.api.Fraction;
-import org.wildfly.swarm.spi.api.SocketBinding;
 import org.wildfly.swarm.datasources.DatasourcesFraction;
 import org.wildfly.swarm.keycloak.server.KeycloakServerFraction;
+import org.wildfly.swarm.spi.api.Fraction;
+import org.wildfly.swarm.spi.api.SocketBinding;
 import org.wildfly.swarm.undertow.UndertowFraction;
 
 public class Main {
@@ -35,17 +35,17 @@ public class Main {
         // Configure the KeycloakDS datasource to use postgres
         DatasourcesFraction datasourcesFraction = new DatasourcesFraction();
         datasourcesFraction
-                .jdbcDriver("org.postgresql", (d) -> {
-                    d.driverDatasourceClassName("org.postgresql.Driver");
-                    d.xaDatasourceClass("org.postgresql.xa.PGXADataSource");
-                    d.driverModuleName("org.postgresql");
-                })
-                .dataSource("KeycloakDS", (ds) -> {
-                    ds.driverName("org.postgresql");
-                    ds.connectionUrl(databaseUrl.jdbcUrl());
-                    ds.userName(databaseUrl.username());
-                    ds.password(databaseUrl.password());
-                });
+            .jdbcDriver("postgres", (d) -> {
+                d.driverDatasourceClassName("org.postgresql.ds.PGSimpleDataSource");
+                d.xaDatasourceClass("org.postgresql.xa.PGXADataSource");
+                d.driverModuleName("org.postgresql");
+            })
+            .dataSource("KeycloakDS", (ds) -> {
+                ds.driverName("postgres");
+                ds.connectionUrl(databaseUrl.jdbcUrl());
+                ds.userName(databaseUrl.username());
+                ds.password(databaseUrl.password());
+            });
 
         container.fraction(datasourcesFraction);
 
@@ -65,17 +65,17 @@ public class Main {
 
         UndertowFraction undertowFraction = new UndertowFraction();
         undertowFraction
-                .server(new Server("default-server")
-                        .httpListener(new HTTPListener("default")
-                                .socketBinding("http")
-                                .redirectSocket("proxy-https")
-                                .proxyAddressForwarding(true))
-                        .host(new Host("default-host")))
-                .bufferCache(new BufferCache("default"))
-                .servletContainer(new ServletContainer("default")
-                        .websocketsSetting(new WebsocketsSetting())
-                        .jspSetting(new JSPSetting()))
-                .handlerConfiguration(new HandlerConfiguration());
+            .server(new Server("default-server")
+                .httpListener(new HTTPListener("default")
+                    .socketBinding("http")
+                    .redirectSocket("proxy-https")
+                    .proxyAddressForwarding(true))
+                .host(new Host("default-host")))
+            .bufferCache(new BufferCache("default"))
+            .servletContainer(new ServletContainer("default")
+                .websocketsSetting(new WebsocketsSetting())
+                .jspSetting(new JSPSetting()))
+            .handlerConfiguration(new HandlerConfiguration());
 
         container.fraction(undertowFraction);
 
